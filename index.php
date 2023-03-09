@@ -14,8 +14,6 @@ try {
     echo 'Chyba při připojení k databázi: ' . $e->getMessage();
 }
 
-$query = $db->query('SELECT * FROM events');
-$events = $query->fetchAll();
 
 // Kontrola, zda je uživatel přihlášen
 if (!isset($_SESSION['user_id'])) {
@@ -52,6 +50,30 @@ if (isset($_POST['create_event'])) {
         echo 'Chyba při vytváření akce';
     }
 }
+
+
+
+spl_autoload_register(function ($class) {
+  $file = __DIR__ . '/' . str_replace('\\', '/', $class) . '.php';
+  if (file_exists($file)) {
+      require_once $file;
+      return true;
+  }
+  return false;
+});
+use Nette\Application\UI;
+// vytvoření objektu šablony
+$template = new UI\ITemplate;
+$template->setFile(__DIR__ . '/templates/index.latte');
+// Načtení dat z databáze
+$query = $db->query('SELECT * FROM events');
+$events = $query->fetchAll();
+// Předání dat do šablony
+$template->events = $events;
+// Vypsání šablony
+$template->render();
+
+
 
 ?>
 
